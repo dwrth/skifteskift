@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <rubberband/RubberBandStretcher.h>
 
 //==============================================================================
 /**
@@ -52,8 +53,14 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-
+    
+    //==============================================================================
+    float skiftVal;
+    
 private:
+    //==============================================================================
+    RubberBand::RubberBandStretcher* rubberSkifter = nullptr;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SkifteskiftAudioProcessor)
 };

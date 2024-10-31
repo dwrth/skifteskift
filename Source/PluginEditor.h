@@ -14,7 +14,7 @@
 //==============================================================================
 /**
 */
-class SkifteskiftAudioProcessorEditor  : public juce::AudioProcessorEditor
+class SkifteskiftAudioProcessorEditor  : public juce::AudioProcessorEditor, private juce::Slider::Listener
 {
 public:
     SkifteskiftAudioProcessorEditor (SkifteskiftAudioProcessor&);
@@ -27,7 +27,11 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
+    void sliderValueChanged(juce::Slider* slider) override;
     SkifteskiftAudioProcessor& audioProcessor;
+    
+    juce::Slider skift;
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SkifteskiftAudioProcessorEditor)
 };

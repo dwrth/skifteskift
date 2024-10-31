@@ -22,10 +22,13 @@ SkifteskiftAudioProcessor::SkifteskiftAudioProcessor()
                        )
 #endif
 {
+    skiftVal = 1.0f;
+    DBG("Plugin initialized with skiftVal: " << skiftVal);
 }
 
 SkifteskiftAudioProcessor::~SkifteskiftAudioProcessor()
 {
+    delete rubberSkifter;
 }
 
 //==============================================================================
@@ -93,14 +96,29 @@ void SkifteskiftAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void SkifteskiftAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    if (rubberSkifter != nullptr) {
+        delete rubberSkifter;
+    }
+
+    int options = RubberBand::RubberBandStretcher::OptionProcessRealTime |
+                 RubberBand::RubberBandStretcher::OptionPitchHighQuality |
+                 RubberBand::RubberBandStretcher::OptionTransientsCrisp |
+                 RubberBand::RubberBandStretcher::OptionWindowShort;
+    
+    rubberSkifter = new RubberBand::RubberBandStretcher(sampleRate, 2, options);
+    rubberSkifter->setMaxProcessSize(samplesPerBlock);
+    rubberSkifter->setPitchScale(skiftVal);
+    rubberSkifter->reset();
 }
 
 void SkifteskiftAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    
+    delete rubberSkifter;
+    rubberSkifter = nullptr;
+    
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -131,30 +149,36 @@ bool SkifteskiftAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 
 void SkifteskiftAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    if (rubberSkifter == nullptr) return;
+
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+    // Clear any unused output channels
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
+    // Update pitch scale from slider
+    rubberSkifter->setPitchScale(skiftVal);
+
+    // Create input/output arrays
+    std::vector<const float*> inputBuffers(totalNumInputChannels);
+    std::vector<float*> outputBuffers(totalNumInputChannels);
+
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
+        inputBuffers[channel] = buffer.getReadPointer(channel);
+        outputBuffers[channel] = buffer.getWritePointer(channel);
+    }
 
-        // ..do something to the data...
+    // Process the audio - note the false parameter for continuous processing
+    rubberSkifter->process(&inputBuffers[0], buffer.getNumSamples(), false);
+    
+    size_t available = rubberSkifter->available();
+    if (available > 0)
+    {
+        rubberSkifter->retrieve(&outputBuffers[0], std::min(available, (size_t)buffer.getNumSamples()));
     }
 }
 
