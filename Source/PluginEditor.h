@@ -8,20 +8,20 @@
 
 #pragma once
 
-#include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include <JuceHeader.h>
 
 //==============================================================================
 /**
-*/
-class SkifteskiftAudioProcessorEditor  : public juce::AudioProcessorEditor
+ */
+class SkifteskiftAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    SkifteskiftAudioProcessorEditor (SkifteskiftAudioProcessor&);
+    SkifteskiftAudioProcessorEditor(SkifteskiftAudioProcessor&);
     ~SkifteskiftAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint(juce::Graphics&) override;
     void resized() override;
 
 private:
@@ -29,5 +29,5 @@ private:
     // access the processor object that created it.
     SkifteskiftAudioProcessor& audioProcessor;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SkifteskiftAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SkifteskiftAudioProcessorEditor)
 };

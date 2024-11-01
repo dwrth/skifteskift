@@ -3,3 +3,17 @@ JuceLibraryCode
 .DS_STORE
 
 Builds
+
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcxproj.user.filters
+*.vcxproj.user.local
+
+.cache
+
+*.xcodeproj
+*.xcodeproj.user
+*.xcodeproj.user.local
+
+build

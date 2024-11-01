@@ -1,0 +1,18 @@
+{
+	"configurations": [
+		{
+			"name": "Mac/Linux",
+			"includePath": [
+				"${workspaceFolder}/**",
+				"${workspaceFolder}/../../../JUCE/modules/**"
+			],
+			"defines": ["JUCE_DISPLAY_SPLASH_SCREEN=0", "JUCE_VST3_CAN_REPLACE_VST2=0"],
+			"macFrameworkPath": ["/System/Library/Frameworks", "/Library/Frameworks"],
+			"compilerPath": "/usr/bin/clang++",
+			"cStandard": "c17",
+			"cppStandard": "c++17",
+			"intelliSenseMode": "clang-x64"
+		}
+	],
+	"version": 4
+}
